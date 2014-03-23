@@ -1,11 +1,19 @@
 package com.moysa.searchwizard.core;
 
+import com.moysa.searchwizard.db.WordsSQLHelper;
+import com.moysa.searchwizard.exceptions.SQLConnectionException;
+
+import java.sql.SQLException;
 import java.util.*;
 
 /**
  * Expands one request with a list of similar
  */
 public class Expander {
+
+    private static final String SERVER_ADDRESS = "jdbc:mysql://localhost/words?";
+
+    private static final String CONNECTION_EXCEPTION_MESSAGE = "Can't connect to server";
 
     /**
      * Request from user
@@ -17,11 +25,15 @@ public class Expander {
      */
     private Set<String> similarRequests;
 
-    public Expander(String request) {
+    public Expander(String request) throws SQLConnectionException {
 
-        //TODO Check request words on similarity
-        this.request = request;
-        this.similarRequests = new HashSet<>();
+        if (WordsSQLHelper.newInstance().connect(SERVER_ADDRESS)) {
+            setRequest(request);
+            this.similarRequests = new HashSet<>();
+        } else {
+            throw new SQLConnectionException(CONNECTION_EXCEPTION_MESSAGE);
+        }
+
     }
 
     /**
@@ -144,44 +156,21 @@ public class Expander {
      * @return list of synonyms
      */
     private List<String> getSimilarWords(String word) {
-        //TODO query from database for similar words
 
-        List<String> result = new ArrayList<>();
+        List<String> result = null;
 
-        switch (word) {
-            case "Послушать":
-                result = Arrays.asList("Вкусить");
-                break;
-            case "Вкусить":
-                result = Arrays.asList("Послушать");
-                break;
-            case "музыку":
-                result = Arrays.asList("песни", "мелодии");
-                break;
-            case "песни":
-                result = Arrays.asList("музыку", "мелодии");
-                break;
-            case "мелодии":
-                result = Arrays.asList("песни", "музыку");
-                break;
-            case "сейчас":
-                result = Arrays.asList("online", "now");
-                break;
-            case "online":
-                result = Arrays.asList("сейчас", "now");
-                break;
-            case "now":
-                result = Arrays.asList("сейчас", "online");
-                break;
-            case "хорошую":
-                result = Arrays.asList("отличную");
-                break;
-            case "отличную":
-                result = Arrays.asList("хорошую");
-                break;
+        try {
+            result = WordsSQLHelper.getInstance().getSynonymsForWord(word);
+        } catch (SQLException e) {
+            //TODO catch nicely
+            e.printStackTrace();
         }
 
-
         return result;
+    }
+
+    public void setRequest(String request) {
+        //TODO Check request words on similarity
+        this.request = request.toLowerCase();
     }
 }

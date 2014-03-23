@@ -12,8 +12,6 @@ public class ExpanderTest {
     @Test
     public void testExpand() throws Exception {
 
-
-
         Expander expander = new Expander("Послушать хорошую музыку сейчас");
 
         Set<String> result = expander.expand();

@@ -2,7 +2,7 @@ package com.moysa.searchwizard.core;
 
 import org.junit.Test;
 
-import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Test class for Expander
@@ -16,7 +16,8 @@ public class ExpanderTest {
 
         Expander expander = new Expander(request);
 
-        Set<String> result = expander.expand();
+        //sorted by string
+        TreeSet<String> result = new TreeSet<>(expander.expand());
 
         result.forEach(System.out::println);
     }

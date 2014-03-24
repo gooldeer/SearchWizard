@@ -139,9 +139,9 @@ public class Expander {
      * @return map of synonyms per word
      */
     private Map<String, List<String>> getSimilarWordsFromRequest(String request) {
-        //TODO split by words from db instead of space
-        Map<String, List<String>> map = new HashMap<>();
 
+        Map<String, List<String>> map = new HashMap<>();
+        //I don't think that it's a god way to split...
         List<String> words = Arrays.asList(request.split(" "));
 
         words.forEach(word -> map.put(word, getSimilarWords(word)));

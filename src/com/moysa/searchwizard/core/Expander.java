@@ -186,8 +186,6 @@ public class Expander {
      * @param request request to set
      */
     public void setRequest(String request) {
-        //TODO Check request words on similarity
-
         //Removes all non-charachters from string
         this.request = request.toLowerCase().replaceAll("[^\\p{L}\\p{Nd}\\s]", "");
     }

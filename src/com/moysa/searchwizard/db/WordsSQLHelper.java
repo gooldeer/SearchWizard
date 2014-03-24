@@ -2,10 +2,7 @@ package com.moysa.searchwizard.db;
 
 import com.moysa.searchwizard.exceptions.NonDatabaseWordException;
 
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,9 +23,7 @@ public class WordsSQLHelper {
 
     private static WordsSQLHelper instance;
 
-    private java.sql.Connection connect = null;
     private Statement statement = null;
-    private ResultSet resultSet = null;
 
     public static WordsSQLHelper newInstance() {
         instance = new WordsSQLHelper();
@@ -42,7 +37,7 @@ public class WordsSQLHelper {
     public List<String> getSynonymsForWord(String word) throws SQLException, NonDatabaseWordException {
 
         // resultSet gets the result of the SQL query
-        resultSet = statement
+        ResultSet resultSet = statement
                 .executeQuery(SQL_QUERY_FOR_WORD + "'" + word + "'" + ";");
 
         return writeResultSet(resultSet);
@@ -53,7 +48,7 @@ public class WordsSQLHelper {
         try {
             Class.forName("com.mysql.jdbc.Driver");
             // setup the connection with the DB.
-            connect = DriverManager
+            Connection connect = DriverManager
                     .getConnection(url
                             + "user=" + USER + "&password=" + PASS);
 

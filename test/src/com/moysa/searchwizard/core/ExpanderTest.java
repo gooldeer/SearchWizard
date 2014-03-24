@@ -12,7 +12,9 @@ public class ExpanderTest {
     @Test
     public void testExpand() throws Exception {
 
-        Expander expander = new Expander("Послушать хорошую музыку сейчас");
+        String request = "Было-бы хорошо сейчас послушать хорошую музыку";
+
+        Expander expander = new Expander(request);
 
         Set<String> result = expander.expand();
 

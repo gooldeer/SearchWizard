@@ -1,6 +1,11 @@
 package com.moysa.searchwizard.db;
 
-import java.sql.*;
+import com.moysa.searchwizard.exceptions.NonDatabaseWordException;
+
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,7 +39,7 @@ public class WordsSQLHelper {
         return instance;
     }
 
-    public List<String> getSynonymsForWord(String word) throws SQLException {
+    public List<String> getSynonymsForWord(String word) throws SQLException, NonDatabaseWordException {
 
         // resultSet gets the result of the SQL query
         resultSet = statement
@@ -65,12 +70,16 @@ public class WordsSQLHelper {
         }
     }
 
-    private List<String> writeResultSet(ResultSet resultSet) throws SQLException {
+    private List<String> writeResultSet(ResultSet resultSet) throws SQLException, NonDatabaseWordException {
         List<String> result = new ArrayList<>();
 
         while (resultSet.next()) {
 
             result.add(resultSet.getString(SYNONYM_COLUMN));
+        }
+
+        if (result.size() == 0) {
+            throw new NonDatabaseWordException();
         }
 
         return result;

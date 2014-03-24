@@ -1,6 +1,7 @@
 package com.moysa.searchwizard.core;
 
 import com.moysa.searchwizard.db.WordsSQLHelper;
+import com.moysa.searchwizard.exceptions.NonDatabaseWordException;
 import com.moysa.searchwizard.exceptions.SQLConnectionException;
 
 import java.sql.SQLException;
@@ -12,8 +13,6 @@ import java.util.*;
 public class Expander {
 
     private static final String SERVER_ADDRESS = "jdbc:mysql://localhost/words?";
-
-    private static final String CONNECTION_EXCEPTION_MESSAGE = "Can't connect to server";
 
     /**
      * Request from user
@@ -31,7 +30,7 @@ public class Expander {
             setRequest(request);
             this.similarRequests = new HashSet<>();
         } else {
-            throw new SQLConnectionException(CONNECTION_EXCEPTION_MESSAGE);
+            throw new SQLConnectionException();
         }
 
     }
@@ -164,13 +163,32 @@ public class Expander {
         } catch (SQLException e) {
             //TODO catch nicely
             e.printStackTrace();
+        } catch (NonDatabaseWordException e) {
+            //simply remove word if it's not in database
+            removeWordFromRequest(word);
         }
 
         return result;
     }
 
+    /**
+     * Removes word from request
+     * @param word word to remove
+     */
+    private void removeWordFromRequest(String word) {
+
+        String regex = "\\s*\\b" + word + "\\b\\s*";
+        request = request.replaceAll(regex, "");
+    }
+
+    /**
+     * Prepares request (removes all non-char symbols)
+     * @param request request to set
+     */
     public void setRequest(String request) {
         //TODO Check request words on similarity
-        this.request = request.toLowerCase();
+
+        //Removes all non-charachters from string
+        this.request = request.toLowerCase().replaceAll("[^\\p{L}\\p{Nd}\\s]", "");
     }
 }

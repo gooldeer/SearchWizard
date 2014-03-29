@@ -14,8 +14,14 @@ public class Expander {
 
     private static final String SERVER_ADDRESS = "jdbc:mysql://localhost/words?";
 
+
     /**
-     * Request from user
+     * Original request from user. Just saved.
+     */
+    private String originalRequest;
+
+    /**
+     * Current request for work
      */
     private String request;
 
@@ -59,8 +65,9 @@ public class Expander {
         //go to word on which we are now
         do {
 
-            if (!iterator.hasNext())
-                return similarRequests;
+            if (!iterator.hasNext()) {
+                return removeOriginalRequestFromSet();
+            }
 
             String word = iterator.next();
             List<String> similars = similarWords.get(word);
@@ -76,6 +83,15 @@ public class Expander {
             createRequestsFromWords(getSimilarWordsFromRequest(similar));
         });
 
+        return removeOriginalRequestFromSet();
+    }
+
+    /**
+     * In algorithm original request is doubled, we need to remove on of them
+     * @return Set with removed original request
+     */
+    private Set<String> removeOriginalRequestFromSet() {
+        similarRequests.remove(originalRequest);
         return similarRequests;
     }
 
@@ -105,9 +121,14 @@ public class Expander {
     private List<String> replaceWordWithSynonyms(String request, String word, List<String> synonyms) {
 
         List<String> requests = new ArrayList<>();
+        requests.add(request);
 
         List<String> words = Arrays.asList(request.split(" "));
         int index = words.indexOf(word);
+
+        if (synonyms == null) {
+            return requests;
+        }
 
         synonyms.forEach(similar -> {
 
@@ -163,9 +184,6 @@ public class Expander {
         } catch (SQLException e) {
             //TODO catch nicely
             e.printStackTrace();
-        } catch (NonDatabaseWordException e) {
-            //simply remove word if it's not in database
-            removeWordFromRequest(word);
         }
 
         return result;
@@ -173,12 +191,16 @@ public class Expander {
 
     /**
      * Removes word from request
+     * @param request request to remove words from
      * @param word word to remove
+     * @return request
      */
-    private void removeWordFromRequest(String word) {
+    private String removeWordFromRequest(String request, String word) {
 
-        String regex = "\\s*\\b" + word + "\\b\\s*";
+        String regex = word + "\\b\\s*";
         request = request.replaceAll(regex, "");
+
+        return request;
     }
 
     /**
@@ -186,7 +208,34 @@ public class Expander {
      * @param request request to set
      */
     public void setRequest(String request) {
-        //Removes all non-charachters from string
-        this.request = request.toLowerCase().replaceAll("[^\\p{L}\\p{Nd}\\s]", "");
+        this.request = transformRequest(request);
+        this.originalRequest = this.request;
+    }
+
+    /**
+     * Transforms request for using in expander
+     * Replaces words with it's standards
+     * @param request request to transform
+     * @return transformed request
+     */
+    private String transformRequest(String request) {
+
+        String result = request.toLowerCase().replaceAll("[^\\p{L}\\p{Nd}\\s]", "");
+
+        List<String> words = Arrays.asList(request.split(" "));
+
+        for (String word : words) {
+
+            try {
+                result = result.replace(word, WordsSQLHelper.getInstance().queryForWordInBase(word));
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } catch (NonDatabaseWordException e) {
+                //simply remove word if it's not in database
+//                result = removeWordFromRequest(request, word);
+            }
+        }
+
+        return result;
     }
 }

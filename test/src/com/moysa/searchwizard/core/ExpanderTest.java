@@ -1,5 +1,6 @@
 package com.moysa.searchwizard.core;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.TreeSet;
@@ -12,7 +13,7 @@ public class ExpanderTest {
     @Test
     public void testExpand() throws Exception {
 
-        String request = "Было-бы хорошо сейчас послушать хорошую музыку";
+        String request = "Найти хороший стиль медленной песни";
 
         Expander expander = new Expander(request);
 
@@ -20,5 +21,7 @@ public class ExpanderTest {
         TreeSet<String> result = new TreeSet<>(expander.expand());
 
         result.forEach(System.out::println);
+
+        Assert.assertEquals(27, result.size());
     }
 }

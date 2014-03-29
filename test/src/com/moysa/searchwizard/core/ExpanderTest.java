@@ -22,6 +22,6 @@ public class ExpanderTest {
 
         result.forEach(System.out::println);
 
-        Assert.assertEquals(27, result.size());
+        Assert.assertEquals(54, result.size());
     }
 }

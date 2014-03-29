@@ -20,7 +20,7 @@ public class WordsSQLHelper {
     /**
      * Query for getting synonyms list
      */
-    private static final String SQL_QUERY_FOR_SYNONYMS = "SELECT morphism, ending "
+    private static final String SQL_QUERY_FOR_SYNONYMS = "SELECT morpheme, ending "
             + "FROM words.words T1 "
             + "INNER JOIN words.synonyms T2 ON T1.id = T2.synonym_id "
             + "WHERE T2.word_id = " ;
@@ -28,16 +28,16 @@ public class WordsSQLHelper {
     /**
      * Query for getting word from db if exists
      */
-    private static final String SQL_QUERY_WORD_BEGINNING = "SELECT id, morphism, ending "
+    private static final String SQL_QUERY_WORD_BEGINNING = "SELECT id, morpheme, ending "
             + "FROM words.words Words "
             + "WHERE INSTR('";
 
-    private static final String SQL_QUERY_WORD_ENDING = "', Words.morphism) > 0;";
+    private static final String SQL_QUERY_WORD_ENDING = "', Words.morpheme) > 0;";
 
     /**
      * Words table column names
      */
-    public static final String MORPHISM_COLUMN = "morphism";
+    public static final String MORPHEME_COLUMN = "morpheme";
     public static final String ENDING_COLUMN = "ending";
     public static final String ID_COLUMN = "id";
 
@@ -103,7 +103,7 @@ public class WordsSQLHelper {
                 + SQL_QUERY_WORD_ENDING);
 
         if (resultSet.next())
-            result = resultSet.getString(MORPHISM_COLUMN)
+            result = resultSet.getString(MORPHEME_COLUMN)
                     + resultSet.getString(ENDING_COLUMN);
 
         if (result == null) {
@@ -151,12 +151,8 @@ public class WordsSQLHelper {
 
         while (resultSet.next()) {
 
-            result.add(resultSet.getString(MORPHISM_COLUMN) + resultSet.getString(ENDING_COLUMN));
+            result.add(resultSet.getString(MORPHEME_COLUMN) + resultSet.getString(ENDING_COLUMN));
         }
-
-//        if (result.size() == 0) {
-//            throw new NonDatabaseWordException();
-//        }
 
         return result;
     }

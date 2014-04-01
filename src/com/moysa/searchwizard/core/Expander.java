@@ -3,6 +3,8 @@ package com.moysa.searchwizard.core;
 import com.moysa.searchwizard.db.WordsSQLHelper;
 import com.moysa.searchwizard.exceptions.NonDatabaseWordException;
 import com.moysa.searchwizard.exceptions.SQLConnectionException;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.sql.SQLException;
 import java.util.*;
@@ -13,12 +15,19 @@ import java.util.*;
 public class Expander {
 
     private static final String SERVER_ADDRESS = "jdbc:mysql://localhost/words?";
+    public static final String ORIGINAL_REQUEST = "originalRequest";
+    public static final String EQUIVALENT_REQUESTS = "equivalentRequests";
 
 
     /**
      * Original request from user. Just saved.
      */
     private String originalRequest;
+
+    /**
+     * Request saved to remove after end.
+     */
+    private String originalTranslatedRequest;
 
     /**
      * Current request for work
@@ -91,7 +100,7 @@ public class Expander {
      * @return Set with removed original request
      */
     private Set<String> removeOriginalRequestFromSet() {
-        similarRequests.remove(originalRequest);
+        similarRequests.remove(originalTranslatedRequest);
         return similarRequests;
     }
 
@@ -190,6 +199,22 @@ public class Expander {
     }
 
     /**
+     * Pack into json
+     * @return JSONObject with ORIGINAL_REQUEST
+     * and SIMILAR_REQUESTS
+     * @throws JSONException
+     */
+    public JSONObject getJSON() throws JSONException {
+
+        JSONObject jsonObject = new JSONObject();
+
+        jsonObject.put(ORIGINAL_REQUEST, originalRequest);
+        jsonObject.put(EQUIVALENT_REQUESTS, similarRequests);
+
+        return jsonObject;
+    }
+
+    /**
      * Removes word from request
      * @param request request to remove words from
      * @param word word to remove
@@ -208,8 +233,8 @@ public class Expander {
      * @param request request to set
      */
     public void setRequest(String request) {
-        this.request = transformRequest(request);
-        this.originalRequest = this.request;
+        this.originalRequest = request;
+        originalTranslatedRequest = this.request = transformRequest(request);
     }
 
     /**

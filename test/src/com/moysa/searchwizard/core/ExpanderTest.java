@@ -23,5 +23,7 @@ public class ExpanderTest {
         result.forEach(System.out::println);
 
         Assert.assertEquals(54, result.size());
+
+        System.out.println(expander.getJSON());
     }
 }

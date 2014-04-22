@@ -17,6 +17,7 @@ public class Expander {
     private static final String SERVER_ADDRESS = "jdbc:mysql://localhost/words?";
     public static final String ORIGINAL_REQUEST = "originalRequest";
     public static final String EQUIVALENT_REQUESTS = "equivalentRequests";
+    public static final String JDBC_MYSQL = "jdbc:mysql://";
 
 
     /**
@@ -48,6 +49,21 @@ public class Expander {
             throw new SQLConnectionException();
         }
 
+    }
+
+    /**
+     * Constructor, which connects to db in current address
+     * @param request user request
+     * @param mySQLAddress address without 'jdbc:mysql://' and '?' ending
+     * @throws SQLConnectionException
+     */
+    public Expander(String request, String mySQLAddress) throws SQLConnectionException {
+        if (WordsSQLHelper.newInstance().connect(JDBC_MYSQL + mySQLAddress + "?")) {
+            setRequest(request);
+            this.similarRequests = new HashSet<>();
+        } else {
+            throw new SQLConnectionException();
+        }
     }
 
     /**
